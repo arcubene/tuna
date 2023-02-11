@@ -14,22 +14,12 @@ pub const TAGS: [&str; 8] = [
 #[cfg(feature = "nsfw")]
 pub const NSFW_TAGS: [&str; 7] = ["ass", "hentai", "milf", "oral", "paizuri", "ecchi", "ero"];
 
-pub async fn get_waifu(tag: Option<String>) -> Result<WaifuImQuery, reqwest::Error> {
-    let mut url = API_URL.to_owned();
-
-    if let Some(category) = tag {
-        url = url + "?included_tags=" + &category;
-    }
-
-    reqwest::get(url).await?.json::<WaifuImQuery>().await
-}
-
 #[derive(serde::Deserialize)]
-pub struct WaifuImQuery {
+pub struct Waifu {
     images: Vec<Image>,
 }
 
-impl WaifuImQuery {
+impl Waifu {
     pub fn images(&self) -> &[Image] {
         self.images.as_ref()
     }
@@ -145,4 +135,14 @@ impl Tag {
     pub fn tag_id(&self) -> u64 {
         self.tag_id
     }
+}
+
+pub async fn get_waifu(tag: Option<String>) -> Result<Waifu, reqwest::Error> {
+    let mut url = API_URL.to_owned();
+
+    if let Some(category) = tag {
+        url = url + "?included_tags=" + &category;
+    }
+
+    reqwest::get(url).await?.json().await
 }

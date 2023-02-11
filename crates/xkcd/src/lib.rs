@@ -2,10 +2,10 @@ const API_URL: &str = "https://xkcd.com/{}/info.0.json";
 const API_LATEST_URL: &str = "https://xkcd.com/info.0.json";
 
 #[derive(serde::Deserialize)]
-pub struct XkcdQuery {
+pub struct Xkcd {
     month: String,
 
-    num: u64,
+    num: u32,
 
     link: String,
 
@@ -26,7 +26,7 @@ pub struct XkcdQuery {
     day: String,
 }
 
-impl XkcdQuery {
+impl Xkcd {
     pub fn alt(&self) -> &str {
         self.alt.as_ref()
     }
@@ -51,7 +51,7 @@ impl XkcdQuery {
         self.news.as_ref()
     }
 
-    pub fn num(&self) -> u64 {
+    pub fn num(&self) -> u32 {
         self.num
     }
 
@@ -72,23 +72,46 @@ impl XkcdQuery {
     }
 }
 
-pub async fn get_xkcd(num: u64) -> Result<XkcdQuery, reqwest::Error> {
-    let num = num.min(get_xkcd_latest().await?.num).to_string();
+/// Get a selected xkcd comic.
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - There was an error while sending request
+/// - The response could not be parsed into Json
+pub async fn get_xkcd(num: u32) -> Result<Xkcd, reqwest::Error> {
+    let num = num.min(get_xkcd_latest().await?.num).max(1).to_string();
     reqwest::get(API_URL.replace("{}", &num))
         .await?
-        .json::<XkcdQuery>()
+        .json()
         .await
 }
 
-pub async fn get_xkcd_random() -> Result<XkcdQuery, reqwest::Error> {
-    let num = (rand::random::<u64>() % get_xkcd_latest().await?.num).to_string();
+/// Get a random xkcd comic.
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - There was an error while sending request
+/// - The response could not be parsed into Json
+pub async fn get_xkcd_random() -> Result<Xkcd, reqwest::Error> {
+    let latest = get_xkcd_latest().await?.num;
+    let num = (rand::Rng::gen_range(&mut rand::thread_rng(), 1..=latest)).to_string();
+
     reqwest::get(API_URL.replace("{}", &num))
         .await?
-        .json::<XkcdQuery>()
+        .json()
         .await
 }
 
-pub async fn get_xkcd_latest() -> Result<XkcdQuery, reqwest::Error> {
+/// Get the latest xkcd comic.
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - There was an error while sending request
+/// - The response could not be parsed into Json
+pub async fn get_xkcd_latest() -> Result<Xkcd, reqwest::Error> {
     let url = API_LATEST_URL.to_owned();
-    reqwest::get(url).await?.json::<XkcdQuery>().await
+    reqwest::get(url).await?.json().await
 }
