@@ -6,32 +6,32 @@ pub const TAGS: [&str; 31] = [
     "glomp", "slap", "kill", "kick", "happy", "wink", "poke", "dance", "cringe",
 ];
 
-pub async fn get_waifu(tag: Option<String>) -> Result<WaifuPicQuery, reqwest::Error> {
+#[derive(serde::Deserialize)]
+pub struct Waifu {
+    url: String,
+}
+
+impl Waifu {
+    pub fn url(&self) -> &str {
+        self.url.as_ref()
+    }
+}
+
+pub async fn get_waifu(tag: Option<String>) -> Result<Waifu, reqwest::Error> {
     let mut url = API_URL.to_owned() + "sfw/";
     match tag {
         Some(category) => url += &category,
         None => url += "waifu",
     }
-    reqwest::get(url).await?.json::<WaifuPicQuery>().await
+    reqwest::get(url).await?.json().await
 }
 
 #[cfg(feature = "nsfw")]
-pub async fn get_waifu_nsfw(tag: Option<String>) -> Result<WaifuPicQuery, reqwest::Error> {
+pub async fn get_waifu_nsfw(tag: Option<String>) -> Result<Waifu, reqwest::Error> {
     let mut url = API_URL.to_owned() + "nsfw/";
     match tag {
         Some(category) => url += &category,
         None => url += "waifu",
     }
-    reqwest::get(url).await?.json::<WaifuPicQuery>().await
-}
-
-#[derive(serde::Deserialize)]
-pub struct WaifuPicQuery {
-    url: String,
-}
-
-impl WaifuPicQuery {
-    pub fn url(&self) -> &str {
-        self.url.as_ref()
-    }
+    reqwest::get(url).await?.json().await
 }

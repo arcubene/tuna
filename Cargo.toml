@@ -1,26 +1,26 @@
 [package]
 name = "tuna"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 publish = false
 
 [lib]
 
 [dependencies]
-log = "0.4"
-
+shuttle-service = { version = "0.9", features = ["bot-serenity"] }
+shuttle-secrets = "0.9"
 serenity = { version = "0.11", default-features = false, features = [
 	"client",
 	"gateway",
 	"rustls_backend",
 	"model",
 ] }
-shuttle-service = { version = "0.8.0", features = ["bot-serenity"] }
-shuttle-secrets = "0.8.0"
+tracing = "0.1"
 
 rand = "0.8"
 
 animechan = { version = "0.1", path = "crates/animechan" }
+die = { version = "0.1", path = "crates/die" }
 waifu_im = { version = "0.1", path = "crates/waifu_im" }
 waifu_pics = { version = "0.1", path = "crates/waifu_pics" }
 xkcd = { version = "0.1", path = "crates/xkcd" }

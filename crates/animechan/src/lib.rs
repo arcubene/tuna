@@ -24,23 +24,44 @@ impl Quote {
     }
 }
 
+/// Get a random quote.
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - There was an error while sending request
+/// - The response could not be parsed into Json
 pub async fn get_quote_random() -> Result<Quote, reqwest::Error> {
     reqwest::get(API_URL.to_owned() + "random")
         .await?
-        .json::<Quote>()
+        .json()
         .await
 }
 
+/// Get a quote from an anime.
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - There was an error while sending request
+/// - The response could not be parsed into Json
 pub async fn get_quote(anime: &str) -> Result<Quote, reqwest::Error> {
     reqwest::get(API_URL.to_owned() + "quotes/anime?title=" + anime)
         .await?
-        .json::<Quote>()
+        .json()
         .await
 }
 
+/// Get a quote from a character.
+///
+/// # Errors
+///
+/// This function will return an error if:
+/// - There was an error while sending request
+/// - The response could not be parsed into Json
 pub async fn get_quote_character(name: &str) -> Result<Quote, reqwest::Error> {
     reqwest::get(API_URL.to_owned() + "quotes/character?name=" + name)
         .await?
-        .json::<Quote>()
+        .json()
         .await
 }
